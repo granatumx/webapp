@@ -10,4 +10,5 @@ docker-push:
 shell:
 	docker run --rm -it $(TRDEV) bash
 doc:
-	doconce format pandoc README --github_md
+	./gendoc.sh
+	mv README.go.md README.md

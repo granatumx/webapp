@@ -39,11 +39,11 @@ RUN apt-get update
 RUN apt-get install -y yarn
 
 # Used for documentation purposes
-RUN apt install -y python3 python3-pip
-WORKDIR /tmp
-RUN git clone https://github.com/hplgit/doconce.git
-RUN cd doconce && pip3 install .
-RUN cd .. && rm -rf doconce
+# RUN apt install -y python3 python3-pip
+# WORKDIR /tmp
+# RUN git clone https://github.com/hplgit/doconce.git
+# RUN cd doconce && pip3 install .
+# RUN cd .. && rm -rf doconce
 
 # Copy source over so that we can proceed with build inside of docker
 WORKDIR /usr/src/gx
