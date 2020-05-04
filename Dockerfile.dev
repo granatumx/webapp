@@ -1,0 +1,73 @@
+# In vim, if you want colors to highlight this file correctly, type: ":set syntax=dockerfile"
+FROM ubuntu:latest
+MAINTAINER "granatumx" granatumx@github.com
+
+# Make terminal colorful, useful for build information, editing, etc...
+ENV TERM=xterm-256color
+ENV PATH="$PATH:."
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV TZ America/New_York
+
+RUN apt-get update
+RUN apt-get install -y apt-utils
+RUN apt-get install -y build-essential 
+RUN apt-get install -y bash-completion
+RUN apt-get install -y git
+RUN apt-get install -y curl
+
+# Install vim if that is the type of editor you like
+RUN apt-get install -y vim
+# Typescript highlighting has not been merged
+RUN git clone https://github.com/leafgarland/typescript-vim.git ~/.vim/pack/typescript/start/typescript-vim
+RUN echo "syntax on" > ~/.vimrc
+
+# Install micro if that is how you like to develop, uncomment the next two lines
+# RUN curl https://getmic.ro | bash
+# RUN mv micro /usr/local/bin
+
+# Install node and dependencies/useful tools
+RUN apt-get install -y nodejs npm
+RUN npm install -g n
+RUN n stable
+RUN npm install -g depcheck typescript npm-check-updates
+
+# Install yarn (useful for builds)
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get update  
+RUN apt-get install -y yarn
+
+# Used for documentation purposes
+RUN apt install -y python3 python3-pip
+WORKDIR /tmp
+RUN git clone https://github.com/hplgit/doconce.git
+RUN cd doconce && pip3 install .
+RUN cd .. && rm -rf doconce
+
+# Copy source over so that we can proceed with build inside of docker
+WORKDIR /usr/src/gx
+
+# Build software inside of docker image
+COPY [^D]*.* ./
+COPY .* ./
+COPY public public
+COPY src src
+COPY tools tools
+COPY typings typings
+
+RUN yarn install
+RUN yarn build
+
+# Ensures Dockerfiles are copied over, but allows updates to Dockerfile(s) without rebuilding packages
+# See "COPY [^D]*.* ./" above which copies everything except dockerfiles.
+# To speed up iteration, install each package separately so it is cached once building.
+# Also build the packages that break most often nearer to the end.
+
+COPY . .
+
+COPY .bashrc /root/.bashrc
+
+SHELL [ "/bin/bash", "-i", "-l", "-c" ]
+
+EXPOSE 80 443 8080 34567
