@@ -7,7 +7,7 @@
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { connectRoutes } from 'redux-first-router';
 
-import ApolloClient from 'apollo-client/ApolloClient';
+import { ApolloClient } from 'apollo-client'; /* /ApolloClient'; */
 import { Request } from 'express';
 import createLogger from './logger';
 import componentStates from './reducers/app/componentStates';
