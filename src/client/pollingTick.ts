@@ -27,36 +27,6 @@ export default async (store, apolloClient) => {
       continue;
     }
 
-    const resPollingWhetherNecessary = await apolloClient.query({
-      query: gql`
-        query PollingWhetherNecessary($currentProjectId: UUID!) {
-          projectById(id: $currentProjectId) {
-            id
-            stepsByProjectId {
-              nodes {
-                id
-                status
-              }
-            }
-          }
-        }
-      `,
-      variables: { currentProjectId },
-    });
-
-    const stepStatusesProject = resPollingWhetherNecessary.data.projectById;
-
-    if (stepStatusesProject == null) {
-      // No update necessary
-      continue;
-    }
-
-    const stepStatuses = stepStatusesProject.stepsByProjectId.nodes.map((x) => x.status);
-
-    if (stepStatuses.indexOf('INITIATED') === -1) {
-      continue;
-    }
-
     const resPollingTick = await apolloClient.query({
       query: gql`
         query PollingGetUpdateAt($currentProjectId: UUID!) {
@@ -65,6 +35,7 @@ export default async (store, apolloClient) => {
             stepsByProjectId {
               nodes {
                 id
+		status
                 updatedAt
               }
             }
@@ -75,14 +46,19 @@ export default async (store, apolloClient) => {
       fetchPolicy: 'network-only',
     });
 
-    const stepProbes = resPollingTick.data.projectById.stepsByProjectId.nodes.filter(({id, status, updateAt }) => executionStatus[id] == undefined);
-    stepProbes.forEach(({id, status, updateAt}) => executionStatus[id] = status);
+    if (resPollingTick.data.projectById == null) {
+       continue;
+    }
+
+    const stepProbes = resPollingTick.data.projectById.stepsByProjectId.nodes.filter(({id, status, updatedAt }) => executionStatus[id] == undefined).filter(({id, status, updatedAt}) => status !== 'IDLE');
+    stepProbes.forEach(({id, status, updatedAt}) => executionStatus[id] = status);
 
     stepProbes.map(async ({ id, status, updatedAt }) => {
       let prevStatus = status;
       let newStatus = status;
+      let firsttime = true;
 
-      while(newStatus !== 'DONE') {
+      while(newStatus !== 'IDLE' && newStatus !== 'DONE') {
         await delay(PROBE_INTERVAL);
         const res = await apolloClient.query({
           query: gql`
@@ -106,15 +82,18 @@ export default async (store, apolloClient) => {
           variables: { id },
           fetchPolicy: 'network-only',
         });
-
+       
         prevStatus = newStatus;
-        newStatus = res.data.stepById.status;
+        newStatus = (res.data.stepById == null) ? prevStatus : res.data.stepById.status;
 
-        if (prevStatus !== newStatus) {
-          store.dispatch({
-            type: UPDATE_STEP_JUST_CHANGED_STATUS,
-            payload: { $set: { open: true, id, prevStatus, newStatus } },
-          });
+        if (firsttime) {
+          store.dispatch({ type: UPDATE_STEP_JUST_CHANGED_STATUS, payload: { $set: { open: false, stepId: id, prevStatus: prevStatus, newStatus: newStatus, errors: res.data.stepById.errors } }});
+          firsttime = false;
+        } else if (newStatus === 'DONE' || newStatus === 'IDLE') {
+          store.dispatch({ type: UPDATE_STEP_JUST_CHANGED_STATUS, payload: { $set: { open: true, stepId: id, prevStatus: prevStatus, newStatus: newStatus, errors: res.data.stepById.errors } }});
+
+        } else {
+          store.dispatch({ type: UPDATE_STEP_JUST_CHANGED_STATUS, payload: { $set: {stepId: id, prevStatus: prevStatus, newStatus: newStatus, errors: res.data.stepById.errors}} });
         }
       }
       executionStatus[id] = undefined;

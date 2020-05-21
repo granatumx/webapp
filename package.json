@@ -13,6 +13,7 @@
     "not ie < 9"
   ],
   "dependencies": {
+    "compression": "latest",
     "@babel/polyfill": "^7.8.7",
     "@devexpress/dx-react-core": "^2.6.2",
     "@devexpress/dx-react-grid": "^2.6.2",
@@ -65,7 +66,7 @@
     "front-matter": "^3.1.0",
     "fs-extra": "^9.0.0",
     "glob": "^7.1.6",
-    "graphql": "15.0.0",
+    "graphql": "14.5.3",
     "graphql-tag": "2.10.3",
     "graphql-tools": "^5.0.0",
     "graphql-type-json": "^0.3.1",
@@ -172,7 +173,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "resolutions": {
-    "graphql": "15.0.0"
+    "graphql": "14.5.3"
   },
   "babel": {
     "presets": [

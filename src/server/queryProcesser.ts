@@ -3,7 +3,7 @@ import { readJsonSync, writeFileSync } from 'fs-extra';
 import _ from 'lodash';
 import Papa from 'papaparse';
 import { resolve } from 'path';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 import { trace } from '../common/utils';
 import config from './config';
@@ -345,6 +345,10 @@ const tryProcessingQuery = async ({ query, user }) => {
     throw new Error('Endpoint missing.');
   }
 
+  console.log("Querying process");
+  console.log(query);
+  console.log(user);
+
   if (audience === '__granatum') {
     switch (endpoint) {
       case 'getDataPiecePreview':
@@ -360,6 +364,7 @@ const tryProcessingQuery = async ({ query, user }) => {
     }
   }
 
+  console.log("Actually running process module query");
   return processModuleQuery(query);
 };
 

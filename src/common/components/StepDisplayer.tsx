@@ -87,9 +87,15 @@ const enhance = compose<{ gFuncs; gboxId; meta; frontend }, any>(
       nextStep: actionCreators.nextStep,
     }
   ),
+  connect(
+    (state: IReduxState) => ({
+      stepJustFinished: state.app.dialog.stepJustFinished,
+    }),
+    null,
+  ),
   graphql(
     gql`
-      query ModuleChooser($currentProjectId: UUID!, $currentStepId: UUID!) {
+      query ProjectChooser($currentProjectId: UUID!) {
         projectById(id: $currentProjectId) {
           id
           rank
@@ -113,6 +119,21 @@ const enhance = compose<{ gFuncs; gboxId; meta; frontend }, any>(
             }
           }
         }
+      }`,
+    {
+      options: (props:any) => ({
+        variables: {currentProjectId: props.currentProjectId},
+      })
+    }
+  ),
+  branch(({ data }) => data.loading, renderNothing),
+  withProps(({ data }) => ({
+    currentProject: data.projectById,
+    steps: data.projectById.stepsByProjectId.nodes,
+  })),
+  graphql(
+    gql`
+      query ModuleChooser($currentStepId: UUID!) {
         stepById(id: $currentStepId) {
           id
           rank
@@ -160,18 +181,18 @@ const enhance = compose<{ gFuncs; gboxId; meta; frontend }, any>(
             }
           }
         }
-      }
-    `,
+      }`,
+    {
+      options: (props:any) => ({
+        variables: {currentStepId: props.currentStepId, stepFinished: props.stepJustFinished},
+      })
+    }
   ),
   branch(({ data }) => data.loading, renderNothing),
   /* TODO: this is a hack, remove when upstream fixes the bug */
   guardEmpty('stepById'),
   withProps(({ data }) => ({
-    currentProject: data.projectById,
     currentStep: data.stepById,
-  })),
-  withProps(({ currentProject }) => ({
-    steps: currentProject.stepsByProjectId.nodes,
   })),
   branch(({ currentProject, currentStep }) => currentProject == null || currentStep == null, renderNothing),
   withProps(({ currentStep }) => {
@@ -183,19 +204,21 @@ const enhance = compose<{ gFuncs; gboxId; meta; frontend }, any>(
   connect<any, any, { currentStep: { id: string } }, any>(
     (state) => ({
       componentStates: state.app.componentStates,
-      stepJustFinished: state.app.dialog.stepJustFinished,
     }),
     {
       componentSetState: actionCreators.componentSetState,
-      updateStepJustChangedStatus: actionCreators.updateStepJustChangedStatus,
     },
   ),
+  withProps(({ stepJustFinished, currentStep, currentStepId }) => { 
+    let gstatus = (stepJustFinished.stepId === currentStepId) ? stepJustFinished.newStatus : currentStep.status;
+    return {gstat : gstatus}; }),
   withProps<any, any>(
     ({
       submitStep,
       uploadFile,
       globalError,
       currentProjectId,
+      currentStepId,
       currentStep,
       rfrProjectStep,
       componentStates,
@@ -210,7 +233,8 @@ const enhance = compose<{ gFuncs; gboxId; meta; frontend }, any>(
       clearErrors,
       interceptStep,
       nextStep,
-      stepJustFinished
+      stepJustFinished,
+      gstat,
     }) => ({
       gFuncs: {
         gNextStep: () => {
@@ -248,7 +272,7 @@ const enhance = compose<{ gFuncs; gboxId; meta; frontend }, any>(
             })),
           )
           .reduce((x, y) => x.concat(y || []), []),
-        gStatus: ((stepJustFinished.id === currentStep.id) && stepJustFinished.newStatus) || currentStep.status,
+        gStatus: gstat,
         gGetState: (path = []) => componentStates.getIn([currentStep.id, ...path]),
         gSetState: (newState, path = []) => componentSetState({ path: [currentStep.id, ...path], newState }),
         gReset: () => resetStep({ stepId: currentStep.id }),

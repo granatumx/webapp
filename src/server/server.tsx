@@ -22,6 +22,7 @@ import ReactDOMServer from 'react-dom/server';
 import { createGenerateId, SheetsRegistry } from 'react-jss'; // /lib/jss';
 import fetch from 'universal-fetch';
 import {v4 as uuidv4} from 'uuid';
+import compression from 'compression';
 
 import App from '../common/App';
 import configureStore from '../common/redux/configureStore';
@@ -64,6 +65,8 @@ setImmediate(async () => {
     prependPlugins: postgraphilePlugins,
     dynamicJson: true,
   });
+
+  app.use(compression());
 
   app.use(cookieParser());
 
