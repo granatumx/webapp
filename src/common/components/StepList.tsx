@@ -181,6 +181,10 @@ const enhance: any = compose(
       addStep: actionCreators.addStep,
     },
   ),
+  withProps(({currentStepId}) => {
+    console.log("STEPLIST RECEIVED UPDATE");
+    console.log(currentStepId);
+  }),
   branch((props: any) => props.currentProjectId == null, renderNothing),
   graphql(
     gql`
@@ -203,6 +207,11 @@ const enhance: any = compose(
         }
       }
     `,
+    {
+      options: (props:any) => ({
+        variables: {currentProjectId: props.currentProjectId, currentStepId: props.currentStepId},
+      })
+    },
   ),
   branch(({ data }) => data.loading, renderNothing),
   guardEmpty('projectById'),

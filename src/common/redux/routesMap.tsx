@@ -1019,6 +1019,29 @@ export default {
         `,
         variables: { gboxes, projectId, atStepRank },
       });
+      const res = await apolloClient.query({
+        query: gql`
+          query SAVE_CURRENT_PIPELINE_AS_RECIPE_GetCurrentPipeline($projectId: UUID!) {
+            projectById(id: $projectId) {
+              id
+              stepsByProjectId {
+                nodes {
+                  id
+                  rank
+                  state
+                  gbox
+                }
+              }
+            }
+          }
+        `,
+        variables: { projectId },
+      });
+      let gboxes2 = res.data.projectById.stepsByProjectId.nodes
+      let gboxMinRank = gboxes2.reduce((min, b) => {
+          return (b.rank < min.rank) ? b : min
+        }, gboxes2[0]);
+      dispatch({ type: RFR_PROJECT_STEP, payload: { stepId: gboxMinRank.id } });
     },
   },
 
