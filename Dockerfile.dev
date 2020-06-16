@@ -69,6 +69,11 @@ COPY . .
 
 COPY .bashrc /root/.bashrc
 
+ARG PORT=34567
+ENV PORT=$PORT
+ARG DATABASE_URL=postgres://postgres:12qw@192.168.1.101:5432/granatum
+ENV DATABASE_URL=$DATABASE_URL
+
 SHELL [ "/bin/bash", "-i", "-l", "-c" ]
 
 EXPOSE 80 443 8080 34567
