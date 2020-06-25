@@ -315,6 +315,7 @@ const enhance = compose(
     (state: IReduxState) => ({
       currentProjectId: state.app.currentProjectId,
       currentStepId: state.app.currentStepId,
+      stepJustFinished: state.app.dialog.stepJustFinished,
     }),
     {
       queryBackend: actionCreators.queryBackend,
@@ -363,7 +364,14 @@ const enhance = compose(
         }
       }
     }
-  `),
+  `,
+   {
+     options: (props: any) => ({
+       variables: {currentProjectId: props.currentProjectId, 
+                   currentStepId: props.currentStepId,
+                   stepFinished: props.stepJustFinished},
+   })} 
+  ),
   branch(({ data }) => data.loading, renderNothing),
   guardEmpty('projectById'),
   branch(({ data }) => data.projectById == null, renderNothing),
