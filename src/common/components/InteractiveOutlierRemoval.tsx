@@ -19,6 +19,7 @@ const IdlePage: React.FunctionComponent<any> = ({
   gQueryBackend,
   gIsClient,
   queryViz,
+  updatePlot,
 }) => {
   const plotRows =
     gIsClient &&
@@ -30,6 +31,7 @@ const IdlePage: React.FunctionComponent<any> = ({
       dim2Data: v[1],
       selected: gGetState(['selected'])[k],
     }));
+  let sel = gGetState(['selected']);
 
   return (
     <div>
@@ -55,10 +57,6 @@ const IdlePage: React.FunctionComponent<any> = ({
       <Button variant="contained" color="primary" onClick={queryPlot}>
         Plot
       </Button>
-      <Button variant="contained" color="primary" onClick={queryViz}>
-        Test Query
-      </Button>
-      {gGetState(['vizData']) ? <pre>vizData: {JSON.stringify(gGetState(['vizData']), null, 2)}</pre> : <T>Nothing</T>}
       {gGetState(['vizDataLoading']) && <T>Loading...</T>}
       {plotRows && (
         <div>
@@ -72,7 +70,9 @@ const IdlePage: React.FunctionComponent<any> = ({
                 data={plotRows}
                 fill="#8884d8"
                 onClick={(e) => {
-                  gSetState(true, ['selected', e.__idx]);
+                  sel[e.__idx] = true;
+                  gSetState(sel, ['selected']);
+                  updatePlot(e);
                 }}
               />
               <Scatter
@@ -80,7 +80,9 @@ const IdlePage: React.FunctionComponent<any> = ({
                 data={plotRows.filter((x) => x.selected)}
                 fill="#ff0000"
                 onClick={(e) => {
-                  gSetState(false, ['selected', e.__idx]);
+                  sel[e.__idx] = false;
+                  gSetState(sel, ['selected']);
+                  updatePlot(e);
                 }}
               />
               <Tooltip isAnimationActive={false} cursor={{ strokeDasharray: '3 3' }} />
@@ -109,6 +111,8 @@ const DonePage: React.FunctionComponent<any> = ({ gIsClient, gReset, gResults, g
 
   return (
     <div>
+      {gResults[0].data}
+      <div>You will need to add a step to recalculate coordinates to remove additional outliers.</div>
       {plotRows && (
         <ResponsiveContainer width="100%" height={800}>
           <ScatterChart margin={{ top: 20, right: 20, bottom: 10, left: 10 }}>
@@ -141,27 +145,11 @@ const InteractiveOutlierRemoval = ({ gStatus, ...props }) => {
   }
 };
 
-const initialState = {
-  assaySelection: null,
-  vizCoordsId: null,
-  vizCoordsData: null,
-  selected: null,
-  exportAssayName: 'Filtered assay (outlier removed)',
-  vizData: null,
-  vizDataLoading: false,
-};
-
 const enhance = compose(
   withHandlers({
     queryViz: ({ gQueryBackend, gGetState, gSetState }) => () => {
       gQueryBackend({
         endpoint: 'getVizData',
-        // imports: [
-        //   {
-        //     exportId: gGetState.assaySelection,
-        //     injectInto: 'assay',
-        //   },
-        // ],
       }).then((vizData) => {
         gSetState(vizData, ['vizData']);
         gSetState(false, ['vizDataLoading']);
@@ -176,20 +164,21 @@ const enhance = compose(
         gSetState(Object.keys(vizCoordsData.coords).reduce((obj, k) => ({ ...obj, [k]: false }), {}), ['selected']);
       });
     },
+    updatePlot: ({ gSetState }) => () => {
+      gSetState(Math.random(), ['dummy']);
+    },
   }),
   lifecycle<any, any>({
     componentDidMount() {
-      const { gSetState, gGetState } = this.props;
-      if (gGetState() == null) {
-        gSetState(initialState);
-      }
+      const { gSetState, gGetState, updatePlot } = this.props;
+      updatePlot();
     },
   }),
   branch(({ gGetState }) => gGetState == null, renderNothing),
   withHandlers({
-    submitStep: ({ gGetState, gSubmitStep }) => () => {
+    submitStep: ({ gGetState, gSubmitStep, gboxId }) => () => {
       gSubmitStep({
-        gbox: 'InteractiveOutlierRemoval',
+        gbox: gboxId,
         args: [
           {
             injectInto: 'outliers',

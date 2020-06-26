@@ -53,7 +53,7 @@ const enhance: any = compose(
       <TextField label={label} disabled fullWidth value={`There are no available ${kind} to use.`} />
     )),
   ),
-  lifecycle<{ imports; currentSelection; setCurrentSelection }, any>({
+  lifecycle<{ imports, currentSelection, setCurrentSelection }, any>({
     componentDidMount() {
       const { imports, currentSelection, setCurrentSelection } = this.props;
       if (currentSelection == null) {
