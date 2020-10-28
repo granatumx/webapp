@@ -34,6 +34,13 @@ const TooltippedCell: React.FunctionComponent<any> = ({ value }) => (
   </Tooltip>
 );
 
+const ToolDataProvider: React.FunctionComponent<any> = props => (
+  <DataTypeProvider
+    formatterComponent={TooltippedCell}
+    {...props}
+  />
+);
+
 const DataTable: React.FunctionComponent<any> = ({
   numPages,
   prevPage,
@@ -54,7 +61,7 @@ const DataTable: React.FunctionComponent<any> = ({
     <div className={classes.tableContainer}>
       {console.log(colNames)}
       <Grid rows={rows} columns={columns}>
-        <DataTypeProvider for={colNames} formatterComponent={TooltippedCell} />
+        <ToolDataProvider for={colNames}/>
         <SortingState />
         <IntegratedSorting />
         <VirtualTable />
@@ -87,7 +94,7 @@ const enhance: any = compose(
             .map((x) => ({ ...x, columnName: x.name, width: 750 / columns.length })),
   })),
   withProps(({ data: { data }, columns }) => ({
-    rows: data.map((r) => _.fromPairs(r.map((c, i) => [columns[i].name, c]))),
+    rows: data, // data.map((r) => _.fromPairs(r.map((c, i) => [columns[i].name, c]))),
     colNames: columns.map((x) => x.name),
   })),
   withProps(({ data: { data }, pageSize }) => ({

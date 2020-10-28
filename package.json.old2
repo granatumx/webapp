@@ -164,7 +164,7 @@
     "universal-fetch": "^1.0.0",
     "url-loader": "^4.1.0",
     "uuid": "^8.0.0",
-    "webpack": "^4.43.0",
+    "webpack": "^5.2.0",
     "webpack-bundle-analyzer": "^3.9.0",
     "webpack-bundle-size-analyzer": "^3.1.0",
     "webpack-dev-middleware": "^3.7.2",
@@ -239,7 +239,7 @@
     "serve": "ts-node tools/run runServer",
     "itest": "ts-node integrationTests.ts --gbox",
     "status": "ts-node integrationTests.ts",
-    "start": "NODE_OPTIONS='--max_old_space_size=8192' ts-node $NODE_DEBUG_OPTION tools/run start"
+    "start": "NODE_OPTIONS='--max_old_space_size=8192' SSL_CERT=/usr/src/gx/cert.pem SSL_KEY=/usr/src/gx/key.pem ts-node $NODE_DEBUG_OPTION tools/run start"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",

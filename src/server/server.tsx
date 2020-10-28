@@ -302,12 +302,12 @@ setImmediate(async () => {
 
         const end = now();
         // tslint:disable-next-line:no-console
-        console.log(
-          ` .. ` +
-            `${chalk.bold.blue.inverse(` APOLLO QUERY `)} ` +
-            `(${(end - start).toFixed(2)} ms) ` +
-            `${req.body.operationName} `,
-        );
+        // console.log(
+        //   ` .. ` +
+        //     `${chalk.bold.blue.inverse(` APOLLO QUERY `)} ` +
+        //     `(${(end - start).toFixed(2)} ms) ` +
+        //     `${req.body.operationName} `,
+        // );
 
         return null;
       },

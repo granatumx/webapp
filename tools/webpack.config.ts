@@ -20,7 +20,8 @@ import overrideRules from './lib/overrideRules';
 // @ts-ignore
 import pkg from '../package';
 
-const isDebug = !process.argv.includes('--production');
+const isDebug = false;
+// const isDebug = !process.argv.includes('--production');
 const isVerbose = process.argv.includes('--verbose');
 const isAnalyze = process.argv.includes('--analyze');
 
@@ -44,8 +45,8 @@ const config: webpack.Configuration = {
     path: path.resolve(__dirname, '../build/public/assets'),
     publicPath: '/assets/',
     pathinfo: isVerbose,
-    filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
-    chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
+    filename: isDebug ? '[name].js' : '[name].[hash].js',
+    chunkFilename: isDebug ? '[name].chunk.js' : '[name].[hash].chunk.js',
     devtoolModuleFilenameTemplate: (info) => path.resolve(info.absoluteResourcePath),
   },
 
@@ -248,6 +249,7 @@ const clientConfig: webpack.Configuration = {
 
   entry: {
     client: ['@babel/polyfill', './src/client/client'],
+    //client: ['core-js/stable', './src/client/client'],
   },
 
   plugins: [
