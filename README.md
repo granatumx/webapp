@@ -1,5 +1,4 @@
-> gbox-scripts is an image that provides shell scripts for automating GranatumX deployment
-
+> webapp is an image that provides the frontend for GranatumX
 
 
 
@@ -46,6 +45,8 @@ You can output errors with the build or launch from the docker host with:
 ```
 $ errwebapp
 $ errtaskrunner
+$ gxtail
+$ gxtailtaskrunner
 ```
 
 Under the hood, this alias kicks off a docker run of the `scripts` image which runs a shell script `errWebapp.sh`.

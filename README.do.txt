@@ -1,11 +1,6 @@
 !bquote
-gbox-scripts is an image that provides shell scripts for automating GranatumX deployment
+webapp is an image that provides the frontend for GranatumX
 !equote
-
-## TITLE: Gbox Scripts Manual
-## AUTHOR: D. Garmire at Department of EECS, University of Michigan -- Ann Arbor
-## DATE: today
-## TOC: on
 
 ===== Prerequisites =====
 
@@ -46,6 +41,8 @@ You can output errors with the build or launch from the docker host with:
 !bc sys
 $ errwebapp
 $ errtaskrunner
+$ gxtail
+$ gxtailtaskrunner
 !ec
 Under the hood, this alias kicks off a docker run of the `scripts` image which runs a shell script `errWebapp.sh`.
 This shell script in turn kicks of a docker image via a sibling process to cat the `/var/granatum/err-webapp.log`.
