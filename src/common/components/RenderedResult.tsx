@@ -79,6 +79,8 @@ const RenderedResult: React.FunctionComponent<any> = ({ type, data, classes, ...
       description={props.description}
       className={classes.png}
     />
+  ) : type === 'svg' ? (
+      <img width={props.width} height={props.height} alt="plot" src={`data:image/svg+xml;base64,${data}`} />
   ) : type === 'code' ? (
     <div className={classes.source}>{data}</div>
   ) : type === 'codeExcerpt' ? (
