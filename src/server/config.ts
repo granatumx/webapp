@@ -1,6 +1,6 @@
 export default {
   port: +process.env.PORT || 34567,
-  databaseUrl: process.env.DATABASE_URL || 'postgres://postgres:12qw@192.168.1.101:5432/granatum',
+  databaseUrl: process.env.DATABASE_URL || 'postgres://postgres:12qw@192.168.4.101:5432/granatum',
   uploadPath: process.env.GX_UPLOAD_PATH || '/var/granatum/uploaded_files',
   dataPath: process.env.GX_DATA_PATH || '/var/granatum/data',
   downloadFilePath: process.env.GX_DOWNLOAD_PATH || '/var/granatum/download_files',

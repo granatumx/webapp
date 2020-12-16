@@ -114,6 +114,9 @@ const DataManager = ({
     <List>
       <div style={{ padding: 16 }}>
         <T variant="h5">Project data</T>
+        <T variant="caption">
+		Note that this data is usually in json format. You can usually open in a text editor.
+	</T>
       </div>
       {exportsGroupedByStep.length === 0 ? (
         <div style={{ margin: 16 }}>
