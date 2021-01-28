@@ -58,7 +58,7 @@ export default async (store, apolloClient) => {
       let newStatus = status;
       let firsttime = true;
 
-      while(newStatus !== 'IDLE' && newStatus !== 'DONE') {
+      while(newStatus !== 'IDLE') { // && newStatus !== 'DONE') {
         await delay(PROBE_INTERVAL);
         const res = await apolloClient.query({
           query: gql`
@@ -89,7 +89,7 @@ export default async (store, apolloClient) => {
         if (firsttime) {
           store.dispatch({ type: UPDATE_STEP_JUST_CHANGED_STATUS, payload: { $set: { open: false, stepId: id, prevStatus: prevStatus, newStatus: newStatus, errors: res.data.stepById.errors } }});
           firsttime = false;
-        } else if (newStatus === 'DONE' || newStatus === 'IDLE') {
+        } else if (newStatus === 'DONE') { // || newStatus === 'IDLE') {
           store.dispatch({ type: UPDATE_STEP_JUST_CHANGED_STATUS, payload: { $set: { open: true, stepId: id, prevStatus: prevStatus, newStatus: newStatus, errors: res.data.stepById.errors } }});
 
         } else {
