@@ -65,13 +65,14 @@ async function start() {
   // Configure client-side hot module replacement
   const clientConfig = webpackConfig.find((config) => config.name === 'client');
   clientConfig.entry['client'] = [
+	  /*
     'react-error-overlay',
     'react-hot-loader/patch',
+   */
     'webpack-hot-middleware/client?name=client&reload=true',
   ]
     .concat(clientConfig.entry['client'])
     .sort((a: string, b: string) => +b.includes('polyfill') - +a.includes('polyfill'));
-  /* clientConfig.output.filename = clientConfig.output.filename.replace('chunkhash', 'hash'); */
   clientConfig.output.chunkFilename = clientConfig.output.chunkFilename.replace('chunkhash', 'hash');
   clientConfig.module.rules = clientConfig.module.rules.filter((x) => x.loader !== 'null-loader');
   const { options } = clientConfig.module.rules.find((x) => x.loader === 'babel-loader');

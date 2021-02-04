@@ -8,6 +8,7 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
+  Link,
   List,
   Menu,
   MenuItem,
@@ -116,6 +117,7 @@ const DataManager = ({
         <T variant="h5">Project data</T>
         <T variant="caption">
 		Note that this data is usually in json format. You can usually open in a text editor.
+		Refer to this <Link href="https://syntaxbytetutorials.com/import-json-data-in-excel-2016-or-2019-or-office-365-using-a-get-transform-query/">tutorial</Link> for importing into Excel.
 	</T>
       </div>
       {exportsGroupedByStep.length === 0 ? (

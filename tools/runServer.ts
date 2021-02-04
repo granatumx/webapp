@@ -46,8 +46,9 @@ const runServer = (): Promise<ChildProcessWithHost> =>
       server.kill('SIGTERM');
     }
 
+    // if development drop this in: env: Object.assign({ NODE_ENV: 'development' }, process.env),
     server = spawn('node', [serverPath], {
-      env: Object.assign({ NODE_ENV: 'development' }, process.env),
+      env: Object.assign({ NODE_ENV: 'production' }, process.env),
     });
 
     if (pending) {

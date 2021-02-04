@@ -50,12 +50,6 @@ export default async (store, apolloClient) => {
        continue;
     }
 
-    // First check for transitions from DONE to IDLE (if someone reset), set executionStatus[id] to undefined
-    resPollingTick.data.projectById.stepsByProjectId.nodes.filter(({id, status, updateAt}) => status === 'IDLE' && executionStatus[id] === 'DONE').forEach(({id, status, updateAt}) => {
-          store.dispatch({ type: UPDATE_STEP_JUST_CHANGED_STATUS, payload: { $set: {stepId: id, prevStatus: 'DONE', newStatus: 'IDLE'}} });
-          executionStatus[id] = undefined;
-    });
-    
     const stepProbes = resPollingTick.data.projectById.stepsByProjectId.nodes.filter(({id, status, updatedAt }) => executionStatus[id] == undefined).filter(({id, status, updatedAt}) => status !== 'IDLE');
     stepProbes.forEach(({id, status, updatedAt}) => executionStatus[id] = status);
 
@@ -64,7 +58,7 @@ export default async (store, apolloClient) => {
       let newStatus = status;
       let firsttime = true;
 
-      while(newStatus !== 'IDLE' && newStatus !== 'DONE') {
+      while(newStatus !== 'IDLE') { // && newStatus !== 'DONE') {
         await delay(PROBE_INTERVAL);
         const res = await apolloClient.query({
           query: gql`
@@ -95,18 +89,14 @@ export default async (store, apolloClient) => {
         if (firsttime) {
           store.dispatch({ type: UPDATE_STEP_JUST_CHANGED_STATUS, payload: { $set: { open: false, stepId: id, prevStatus: prevStatus, newStatus: newStatus, errors: res.data.stepById.errors } }});
           firsttime = false;
-        } else if (newStatus === 'DONE') {
+        } else if (newStatus === 'DONE') { // || newStatus === 'IDLE') {
           store.dispatch({ type: UPDATE_STEP_JUST_CHANGED_STATUS, payload: { $set: { open: true, stepId: id, prevStatus: prevStatus, newStatus: newStatus, errors: res.data.stepById.errors } }});
 
         } else {
           store.dispatch({ type: UPDATE_STEP_JUST_CHANGED_STATUS, payload: { $set: {stepId: id, prevStatus: prevStatus, newStatus: newStatus, errors: res.data.stepById.errors}} });
         }
       }
-      if(executionStatus[id] === 'DONE') {
-	executionStatus[id] = 'DONE'
-      } else {
-      	executionStatus[id] = undefined;
-      }
+      executionStatus[id] = undefined;
     });
   }
 };
