@@ -13,6 +13,7 @@
     "not ie < 9"
   ],
   "dependencies": {
+    "ga-4-react": "0.1.281",
     "compression": "latest",
     "@babel/polyfill": "^7.8.7",
     "@devexpress/dx-react-core": "^2.6.2",

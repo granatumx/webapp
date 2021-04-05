@@ -8,6 +8,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
+import GA4React, { useGA4React } from 'ga-4-react';
 import { jssPreset } from '@material-ui/core/styles';
 // eslint-disable-next-line import/no-unresolved,import/extensions
 import { InMemoryCache } from 'apollo-cache-inmemory';
@@ -23,6 +24,8 @@ import fetch from 'universal-fetch';
 import App from '../common/App';
 import configureStore from '../common/redux/configureStore';
 import pollingTick from './pollingTick';
+
+const ga4react = new GA4React("G-XN73MWE2NZ");
 
 (async () => {
   try {
@@ -44,6 +47,8 @@ import pollingTick from './pollingTick';
     const sheetsRegistry = new SheetsRegistry();
     const jss = Jss.create(jssPreset() as any);
     const generateId = createGenerateId();
+
+    await ga4react.initialize(); 
 
     // TODO: make the entire state ImmutableJS
     (window as any).App.state.app.componentStates = fromJS((window as any).App.state.app.componentStates);

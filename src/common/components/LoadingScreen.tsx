@@ -38,6 +38,9 @@ const LoadingScreen = ({ label, message, actions, classes }) => (
       <T variant="h2">{label}</T>
       <LinearProgress />
     </div>
+    {label === "Initiated ..." && (
+      <T variant="h5">You are queued and the system will process when those ahead of you have finished processing. You can periodically refresh the screen or leave the site and come back to check if the step has processed.</T>
+    )}
     {message != null && (
       <div className={classes.messageBox}>
         {message.stdout == null || message.stdout.length === 0 ? null : (
